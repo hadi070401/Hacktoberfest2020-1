@@ -1,0 +1,100 @@
+//Longest subsequence problem
+public class LCS {
+
+	public static void main(String[] args) {
+		String s1 = "abcdefghijklmnopdjwefcikdjciknskswk";
+		String s2 = "abcjdskfsdkcmnvrasvsdvsvvdvskfldcsdmskldwek";
+		// System.out.println(LCSrecursively("abcd", "agcfd"));
+		// System.out.println(LCSvidx(s1,s2,0,0));
+		// top down fails for distinct values so fill the array with different value
+		int[][] arr = new int[s1.length()][s2.length()];
+		for (int i = 0; i < s1.length(); i++) {
+			for (int j = 0; j < s2.length(); j++) {
+				arr[i][j] = -1;
+			}
+		}
+		System.out.println(LCSvidxTopDown(s1, s2, 0, 0, arr));
+		System.out.println(LCSBottomUp(s1,s2));
+	}
+
+	public static int LCSrecursively(String s1, String s2) {
+		if (s1.length() == 0 || s2.length() == 0) {
+			return 0;
+		}
+		char c1 = s1.charAt(0);
+		char c2 = s2.charAt(0);
+		String ros1 = s1.substring(1);
+		String ros2 = s2.substring(1);
+		int ans = 0;
+		if (c1 == c2) {
+			ans = LCSrecursively(ros1, ros2) + 1;
+		} else {
+			int l2 = LCSrecursively(ros1, s2);
+			int l1 = LCSrecursively(s1, ros2);
+			ans = Math.max(l1, l2);
+		}
+		return ans;
+	}
+
+	public static int LCSvidx(String s1, String s2, int vidx1, int vidx2) {
+		if (s1.length() == vidx1 || s2.length() == vidx2) {
+			return 0;
+		}
+		char c1 = s1.charAt(vidx1);
+		char c2 = s2.charAt(vidx2);
+		int ans = 0;
+		if (c1 == c2) {
+			ans = LCSvidx(s1, s2, vidx1 + 1, vidx2 + 1) + 1;
+		} else {
+			int l2 = LCSvidx(s1, s2, vidx1, vidx2 + 1);
+			int l1 = LCSvidx(s1, s2, vidx1 + 1, vidx2);
+			ans = Math.max(l1, l2);
+		}
+		return ans;
+	}
+
+	public static int LCSvidxTopDown(String s1, String s2, int vidx1, int vidx2, int[][] arr) {
+		if (s1.length() == vidx1 || s2.length() == vidx2) {
+			return 0;
+		}
+		// re use
+		if (arr[vidx1][vidx2] != -1) {
+			return arr[vidx1][vidx2];
+		}
+		char c1 = s1.charAt(vidx1);
+		char c2 = s2.charAt(vidx2);
+		int ans = 0;
+		if (c1 == c2) {
+			ans = LCSvidxTopDown(s1, s2, vidx1 + 1, vidx2 + 1, arr) + 1;
+		} else {
+			int l2 = LCSvidxTopDown(s1, s2, vidx1, vidx2 + 1, arr);
+			int l1 = LCSvidxTopDown(s1, s2, vidx1 + 1, vidx2, arr);
+			ans = Math.max(l1, l2);
+		}
+		arr[vidx1][vidx2] = ans;
+		return ans;
+	}
+
+	public static int LCSBottomUp(String s1, String s2) {
+		int[][] arr = new int[s1.length() + 1][s2.length() + 1];
+
+		for (int i = s1.length() - 1; i >= 0; i--) {
+			for (int slide = s2.length() - 1; slide >= 0; slide--) {
+				if(s1.charAt(i)==s2.charAt(slide)){
+					arr[i][slide]=arr[i+1][slide+1]+1;
+				}else {
+					arr[i][slide]=Math.max(arr[i+1][slide],arr[i][slide+1]);
+				}
+			}
+		}
+		System.out.println("------------");
+		for(int i=0;i<s1.length();i++) {
+			for(int j=0;j<s2.length();j++) {
+				System.out.print(arr[i][j]+" ");
+			}
+			System.out.println();
+		}
+		System.out.println("------------");
+		return arr[0][0];
+	}
+}
